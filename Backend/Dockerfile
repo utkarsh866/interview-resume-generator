@@ -1,13 +1,19 @@
 FROM ghcr.io/puppeteer/puppeteer:24
 
+USER root
+
 WORKDIR /app
 
-# Copy package files and install with legacy-peer-deps to avoid Windows lockfile conflicts
 COPY package*.json ./
+
+RUN chown -R pptruser:pptruser /app
+
+USER pptruser
+
 RUN npm install --omit=dev --legacy-peer-deps
 
-COPY . .
+COPY --chown=pptruser:pptruser . .
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
